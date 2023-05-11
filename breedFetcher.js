@@ -1,17 +1,20 @@
 const request = require('request');
 
-const args = process.argv.slice(2);
-
-request(`https://api.thecatap.com/v1/breeds/search?q=${args}`, (error, response, body) => {
-  if (body === undefined) {
-    console.log(error);
-    console.log('Your request failed. Please check your URL and try again.');
-  } else {
-    const data = JSON.parse(body);
-    if (data[0] !== undefined) {
-      console.log(data[0].description);
+const fetchBreedDescription = (breedName, callback) => {
+  request(`https://api.thecatapi.com/v1/breeds/search?q=${breedName}`, (error, response, body) => {
+    if (body === undefined) {
+      callback(`Your request failed. Please check your URL and try again. ${error}`, null);
     } else {
-      console.log("This breed cannot be found. Please try again.");
+      const data = JSON.parse(body);
+      if (data[0] !== undefined) {
+        callback(null, data[0].description);
+      } else {
+        callback(`This breed cannot be found. Please try again. ${error}`, null);
+      }
     }
-  }
-});
+  });
+};
+
+
+
+module.exports = { fetchBreedDescription };
